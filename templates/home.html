@@ -1,3 +1,356 @@
-<h1>
-    hello world
-</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boston House Price Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #477ba8;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+
+        .header {
+    background:  #87adcf;
+    color: #17181b;
+    padding: 30px;
+    text-align: center;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .form-group small {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background:  #477ba8 ;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .sidebar {
+            flex: 1;
+            min-width: 250px;
+            background: #87adcf;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+            color: #05051e;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .sidebar p {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .sidebar small {
+            font-size: 12px;
+            color: #05051e;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: #87adcf;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .price-result {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.show {
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Boston House Price Predictor</h1>
+        <p>Real estate valuation using machine learning</p>
+    </div>
+
+    <div class="container">
+        <!-- Form Section -->
+        <div class="form-container">
+            <form id="predictionForm">
+                <div class="form-grid">
+                    <!-- All Form Fields -->
+                    <div class="form-group">
+                        <label for="crim">Crime Rate (CRIM)</label>
+                        <input type="number" id="crim" name="crim" step="0.01" value="0.1">
+                        <small>Per capita crime rate by town (0-90)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="zn">Zoning (ZN)</label>
+                        <input type="number" id="zn" name="zn" step="0.1" value="18.0">
+                        <small>Residential land zoned over 25,000 sq.ft (%)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="indus">Industrial Area (INDUS)</label>
+                        <input type="number" id="indus" name="indus" step="0.01" value="2.31">
+                        <small>Proportion of non-retail business acres (%)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="chas">Charles River (CHAS)</label>
+                        <input type="number" id="chas" name="chas" min="0" max="1" step="1" value="0">
+                        <small>Bounds Charles River (1 = Yes, 0 = No)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="nox">Air Quality (NOX)</label>
+                        <input type="number" id="nox" name="nox" step="0.001" value="0.538">
+                        <small>Nitric oxides concentration</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="rm">Average Rooms (RM)</label>
+                        <input type="number" id="rm" name="rm" step="0.1" value="6.575">
+                        <small>Average number of rooms per dwelling</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Building Age (AGE)</label>
+                        <input type="number" id="age" name="age" step="0.1" value="65.2">
+                        <small>% built before 1940</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="dis">Employment Distance (DIS)</label>
+                        <input type="number" id="dis" name="dis" step="0.01" value="4.09">
+                        <small>Distance to employment centers</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="rad">Highway Access (RAD)</label>
+                        <input type="number" id="rad" name="rad" step="1" value="1">
+                        <small>Accessibility index to highways</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="tax">Property Tax (TAX)</label>
+                        <input type="number" id="tax" name="tax" step="1" value="296">
+                        <small>Tax rate per $10,000</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="ptratio">Pupil-Teacher Ratio (PTRATIO)</label>
+                        <input type="number" id="ptratio" name="ptratio" step="0.1" value="15.3">
+                        <small>Student-teacher ratio</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="b">Demographics (B)</label>
+                        <input type="number" id="b" name="b" step="0.1" value="396.9">
+                        <small>Proportion of blacks by town</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="lstat">Lower Status % (LSTAT)</label>
+                        <input type="number" id="lstat" name="lstat" step="0.01" value="4.98">
+                        <small>Lower status population (%)</small>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="loading">🔄 Predicting...</span>
+                        <span class="normal"> Predict House Price</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="btn btn-secondary">🔄 Reset Form</button>
+                </div>
+            </form>
+
+            <div id="resultContainer" class="result-container">
+                <div class="price-result" id="priceResult">$0</div>
+                <p>Predicted house price</p>
+            </div>
+        </div>
+
+        <!-- Sidebar Section -->
+        <div class="sidebar">
+            <h2>📍 About This Model</h2>
+            <p>This prediction model is based on the famous Boston Housing dataset and uses 13 key features to estimate median home values. The model considers factors like crime rate, air quality, accessibility, and neighborhood characteristics.</p>
+            
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('predictionForm');
+            const resultContainer = document.getElementById('resultContainer');
+            const priceResult = document.getElementById('priceResult');
+            const resetBtn = document.getElementById('resetBtn');
+            const loadingSpan = document.querySelector('.loading');
+            const normalSpan = document.querySelector('.normal');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                loadingSpan.classList.add('show');
+                normalSpan.style.display = 'none';
+
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => data[key] = parseFloat(value));
+
+                try {
+                    const response = await fetch('/predict_api', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ data: data })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        priceResult.textContent = `$${(result.prediction * 1000).toLocaleString()}`;
+                        resultContainer.classList.add('show');
+                        resultContainer.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        alert('Prediction failed');
+                    }
+                } catch (error) {
+                    alert('Error making prediction.');
+                } finally {
+                    loadingSpan.classList.remove('show');
+                    normalSpan.style.display = 'inline';
+                }
+            });
+
+            resetBtn.addEventListener('click', () => {
+    const inputs = form.querySelectorAll('input[type="number"]');
+    inputs.forEach(input => input.value = '0');
+    resultContainer.classList.remove('show');
+});
+
+        });
+    </script>
+</body>
+</html>
