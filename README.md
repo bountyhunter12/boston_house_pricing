@@ -84,3 +84,6 @@ The app will be accessible at: http://localhost:5000
 ├── Dockerfile
 └── README.md
 ```
+
+### Live web page
+The app will be accessible at: https://boston-house-pricing-snq7.onrender.com
